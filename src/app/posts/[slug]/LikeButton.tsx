@@ -21,7 +21,7 @@ export default function LikeButton({ isLiked, likesCount }: Props) {
     "toggle"
   >(
     { liked: isLiked, count: likesCount },
-    (state, _action) => ({
+    (state) => ({
       liked: !state.liked,
       count: state.liked ? state.count - 1 : state.count + 1,
     }),

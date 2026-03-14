@@ -75,12 +75,12 @@ export default async function PostPage({ params }: PageProps) {
     revalidatePath(`/posts/${postSlug}`);
   }
 
+  const sessionUserId = (session?.user as { id?: string })?.id;
   const isLiked =
     !!session &&
-    !!post.likes.find((like) => like.userId === (session.user as any)?.id);
-
+    !!post.likes.find((like: { userId: string }) => like.userId === sessionUserId);
   const isOwner =
-    !!session && (session.user as any)?.id && post.authorId === (session.user as any).id;
+    !!session && !!sessionUserId && post.authorId === sessionUserId;
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-zinc-50 via-white to-zinc-100 px-4 py-10 font-sans text-zinc-900 dark:from-black dark:via-zinc-950 dark:to-black dark:text-zinc-50">

@@ -4,7 +4,13 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 type PostWithRelations = Awaited<
-  ReturnType<typeof prisma.post.findMany>
+  ReturnType<
+    typeof prisma.post.findMany<{
+      where: { published: boolean };
+      orderBy: { createdAt: "desc" };
+      include: { author: true; likes: true; comments: true };
+    }>
+  >
 >[number];
 
 export default async function Home() {
@@ -52,12 +58,12 @@ export default async function Home() {
                   >
                     Dashboard
                   </Link>
-                  <a
+                  <Link
                     href="/api/auth/signout"
                     className="rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
                   >
                     Se déconnecter
-                  </a>
+                  </Link>
                 </div>
               </>
             ) : (
@@ -111,7 +117,7 @@ export default async function Home() {
           )}
 
           <ul className="space-y-3">
-            {posts.map((post) => (
+            {posts.map((post: PostWithRelations) => (
               <li
                 key={post.id}
                 className="group rounded-2xl border border-zinc-200 bg-white/90 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-zinc-900 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900/90"

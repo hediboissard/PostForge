@@ -13,7 +13,7 @@ interface Props {
 
 export default async function PostComments({ postId, postAuthorId }: Props) {
   const session = await getServerSession(authOptions);
-  const currentUserId = (session?.user as any)?.id as string | undefined;
+  const currentUserId = (session?.user as { id?: string })?.id;
 
   async function addComment(formData: FormData) {
     "use server";
@@ -52,6 +52,8 @@ export default async function PostComments({ postId, postAuthorId }: Props) {
     orderBy: { createdAt: "desc" },
     include: { author: true, post: true },
   });
+
+  type CommentWithAuthor = (typeof comments)[number];
 
   async function deleteComment(formData: FormData) {
     "use server";
@@ -105,7 +107,7 @@ export default async function PostComments({ postId, postAuthorId }: Props) {
       )}
 
       <ul className="space-y-3">
-        {comments.map((comment) => {
+        {comments.map((comment: CommentWithAuthor) => {
           const canDelete =
             !!currentUserId &&
             (comment.authorId === currentUserId ||

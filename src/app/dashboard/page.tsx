@@ -8,6 +8,7 @@ type UserWithPosts = NonNullable<
   Awaited<
     ReturnType<
       typeof prisma.user.findUnique<{
+        where: { email: string };
         include: {
           posts: {
             orderBy: { createdAt: "desc" };

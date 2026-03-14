@@ -7,7 +7,7 @@ import bcrypt from "bcrypt";
 import { prisma } from "./prisma";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma as Parameters<typeof PrismaAdapter>[0]),
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 jours
@@ -62,7 +62,7 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as Session["user"] & { id: string }).id = token.id ?? token.sub ?? "";
+        (session.user as Session["user"] & { id: string }).id = String(token.id ?? token.sub ?? "");
       }
       return session;
     },
