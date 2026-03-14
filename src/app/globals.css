@@ -24,3 +24,26 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Scrollbar PostForge pour le texte d'article */
+.article-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #a1a1aa #18181b;
+}
+
+.article-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.article-scroll::-webkit-scrollbar-track {
+  background: #18181b;
+}
+
+.article-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #22c55e, #a855f7);
+  border-radius: 999px;
+}
+
+.article-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #16a34a, #7c3aed);
+}

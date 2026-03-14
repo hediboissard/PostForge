@@ -1,0 +1,118 @@
+Ce que TU dois faire maintenant (ordre chronologique)
+1. Lancer le projet en local
+Ouvre un terminal dans le dossier postforge :
+
+cd "c:\Users\hbois\OneDrive\Bureau\Projets-Perso\PostForge\postforge"
+npm install
+Démarre le serveur pour vérifier vite fait :
+
+npm run dev
+Va sur http://localhost:3000 pour voir la home (ça plantera tant que la BDD / env ne sont pas config, c’est normal).
+
+2. Créer la base de données sur Supabase
+Va sur https://supabase.com et crée un projet (free tier).
+
+Dans le projet Supabase :
+
+Va dans Settings → Database.
+Récupère l’URL de connexion (format: postgresql://...).
+Dans .env (à la racine de postforge), remplace :
+
+DATABASE_URL=""
+par l’URL Postgres fournie par Supabase.
+
+Retourne dans le terminal (toujours dans postforge) et lance la migration Prisma :
+
+npx prisma migrate dev --name init
+Cela va créer toutes les tables (User, Post, Comment, Like, Account, etc.) dans Supabase.
+
+3. Créer les identifiants OAuth Google
+Va sur la Google Cloud Console : https://console.cloud.google.com.
+
+Crée un projet (ou utilise-en un existant).
+
+Active l’API “Google Identity / OAuth” (écran d’autorisation OAuth si demandé).
+
+Dans Identifiants (Credentials) :
+
+Crée un Client OAuth 2.0 de type Application Web.
+Ajoute ces URIs :
+URI de redirection autorisée : http://localhost:3000/api/auth/callback/google
+Récupère :
+Client ID
+Client Secret
+Dans ton .env, remplis :
+
+GOOGLE_CLIENT_ID="COLLE_ICI_CLIENT_ID"
+GOOGLE_CLIENT_SECRET="COLLE_ICI_CLIENT_SECRET"
+Mets aussi un secret NextAuth :
+
+NEXTAUTH_SECRET="une_random_string_au_moins_32_caractères"
+(Tu peux la générer en ligne ou avec openssl rand -base64 32 si tu as OpenSSL.)
+
+Redémarre le serveur dev si besoin :
+
+npm run dev
+Va sur http://localhost:3000/login et teste le login Google :
+
+Si tout est ok, tu devrais être redirigé vers / connecté.
+4. (Optionnel mais recommandé) Gérer l’inscription par email/mot de passe
+Actuellement, côté credentials, la logique authentifie un utilisateur si son email existe et que le passwordHash correspond, mais il n’y a pas encore de page d’inscription. Pour avoir un vrai flow email/mdp complet :
+
+Étapes que tu peux faire ensuite (je peux aussi les coder si tu veux) :
+Créer une page /register avec un formulaire (email, nom, mot de passe).
+Créer une API route POST /api/register qui :
+Vérifie que l’email n’existe pas déjà.
+Hash le mot de passe avec bcrypt.hash(...).
+Crée un User avec passwordHash.
+Redirige vers /login après inscription, puis login via credentials.
+5. Préparer le déploiement sur Vercel
+Pousser le code sur un repo GitHub (ou GitLab/Bitbucket) :
+
+Dans postforge :
+
+git init
+git add .
+git commit -m "Initial PostForge blog"
+Crée un repo sur GitHub et push (git remote add origin ..., git push -u origin main).
+
+Va sur https://vercel.com, connecte ton compte GitHub et importe le repo postforge.
+
+Dans les Project Settings sur Vercel → Environment Variables, ajoute les mêmes variables que dans ton .env :
+
+DATABASE_URL (URL Supabase)
+NEXTAUTH_SECRET
+NEXTAUTH_URL → l’URL de prod que Vercel va te donner (ex: https://postforge.vercel.app)
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+Redeploie le projet sur Vercel si besoin.
+
+Une fois déployé, teste :
+
+https://ton-domaine-vercel/
+https://ton-domaine-vercel/login
+Login Google
+Création article /posts/new
+Détail article /posts/[slug]
+Dashboard /dashboard
+6. Intégrer dans ton portfolio
+Récupère l’URL Vercel de PostForge (ex. https://postforge.vercel.app).
+Dans ton portfolio :
+Ajoute une section “Projets” avec :
+Nom : PostForge
+Tech : Next.js 16, Tailwind, Prisma, Supabase, NextAuth.
+Lien live : vers l’URL Vercel.
+(Optionnel) lien GitHub du repo.
+Résumé rapide de ce que tu as à faire
+Local:
+
+Remplir .env (Supabase + Google + NEXTAUTH_SECRET).
+npx prisma migrate dev --name init.
+npm run dev et tester les pages.
+Cloud:
+
+Créer la BDD Supabase et récupérer DATABASE_URL.
+Créer crédentials OAuth Google (Client ID/Secret).
+Mettre toutes les variables d’environnement dans Vercel.
+Déployer et tester.
+Si tu veux, prochain message je peux m’occuper aussi de la page /register (inscription email/mot de passe) pour compléter totalement le flow auth.
